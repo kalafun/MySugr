@@ -49,13 +49,19 @@ extension ContentView {
                 return
             }
 
-            measurements.append(Measurement(value: floatValue))
+            addMeasurement(value: floatValue)
 
             // Reset the input value
             textInput = ""
 
             calculateAverage()
             updateAverageText()
+        }
+
+        private func addMeasurement(value: Float) {
+            // always add measurements in mg/dl unit
+            let value = selectedMeasurementUnit == .mgdl ? value : value / MeasurementUnit.conversionConstant
+            measurements.append(Measurement(value: value))
         }
 
         private func calculateAverage() {
