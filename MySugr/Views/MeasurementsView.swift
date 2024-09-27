@@ -13,10 +13,12 @@ struct MeasurementsView: View {
 
     var body: some View {
         VStack {
-            HStack(spacing: 4) {
-                Text("You have")
-                Text("\(viewModel.measurements.count) measurements")
-                    .fontWeight(.bold)
+            if viewModel.measurements.count > 0 {
+                HStack(spacing: 4) {
+                    Text("You have")
+                    Text("\(viewModel.measurements.count) measurements")
+                        .fontWeight(.bold)
+                }
             }
 
             List {
