@@ -13,8 +13,8 @@ struct ContentView: View {
 
     var body: some View {
         VStack {
-            if let average = viewModel.average {
-                Text("Your average is: \(average)")
+            if let _ = viewModel.average {
+                Text("Your average is: \(viewModel.averageText)" +  " " + viewModel.selectedMeasurementUnit.rawValue)
             }
 
             Divider()
@@ -29,6 +29,9 @@ struct ContentView: View {
                     Text(measurement.rawValue)
                 }
             }
+            .onChange(of: viewModel.selectedMeasurementUnit, { oldValue, newValue in
+                viewModel.didChangeMeasurementUnit()
+            })
             .pickerStyle(.segmented)
             .frame(width: 200)
 
@@ -45,8 +48,10 @@ struct ContentView: View {
             Button("Save") {
                 viewModel.save()
             }
+            .disabled(viewModel.textInput.isEmpty)
         }
         .padding()
+        .alert(viewModel.alertMessage, isPresented: $viewModel.showsAlert, actions: {} )
     }
 }
 
