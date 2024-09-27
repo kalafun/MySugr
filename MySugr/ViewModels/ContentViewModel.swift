@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftData
 
 enum MeasurementUnit: String, Identifiable {
 
@@ -36,6 +37,22 @@ extension ContentView {
         @Published var showsAlert = false
         var alertMessage = ""
 
+        // MARK: Swift Data
+        let modelContext: ModelContext
+
+        init(modelContext: ModelContext) {
+            self.modelContext = modelContext
+        }
+
+        func fetchData() {
+            do {
+                let descriptor = FetchDescriptor<Measurement>(sortBy: [SortDescriptor(\.date)])
+                self.measurements = try modelContext.fetch(descriptor)
+            } catch {
+                showAlert(with: "Can't fetch measurements data")
+            }
+        }
+
         func save() {
             if textInput.isEmpty { return }
 
@@ -62,16 +79,23 @@ extension ContentView {
         private func addMeasurement(value: Float) {
             // always add measurements in mg/dl unit
             let value = selectedMeasurementUnit == .mgdl ? value : value / MeasurementUnit.conversionConstant
-            measurements.append(Measurement(value: value))
+            let measurement = Measurement(value: value)
+            modelContext.insert(measurement)
+            do {
+                try modelContext.save()
+            } catch {
+                showAlert(with: "Failed to save measurement")
+            }
+            fetchData()
         }
 
-        private func calculateAverage() {
+        func calculateAverage() {
             average = measurements.reduce(0, { partialResult, measurement in
                 partialResult + measurement.value
             }) / Float(measurements.count)
         }
 
-        private func updateAverageText() {
+        func updateAverageText() {
             guard let average = average else { return }
 
             if let formattedNumber = NumberFormatter.measurement.string(from: average as NSNumber) {

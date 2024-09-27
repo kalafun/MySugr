@@ -6,11 +6,19 @@
 //
 
 import Foundation
+import SwiftData
 
-struct Measurement: Hashable {
-    let id = UUID()
-    let value: Float
-    let date = Date()
+@Model
+class Measurement: Hashable {
+    var id: UUID
+    var value: Float
+    var date: Date
+
+    init(id: UUID = .init(), value: Float, date: Date = Date()) {
+        self.id = id
+        self.value = value
+        self.date = date
+    }
 }
 
 extension Measurement {

@@ -6,11 +6,15 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ContentView: View {
 
-    @StateObject var viewModel = ContentView.ViewModel()
+    @StateObject var viewModel: ContentView.ViewModel
     @StateObject var measurementsViewModel = MeasurementsView.ViewModel()
+
+    // MARK: Swift Data
+    @Environment(\.modelContext) var modelContext
 
     var body: some View {
         NavigationStack {
@@ -52,6 +56,11 @@ struct ContentView: View {
                 }
                 .disabled(viewModel.textInput.isEmpty)
             }
+            .onAppear {
+                viewModel.fetchData()
+                viewModel.calculateAverage()
+                viewModel.updateAverageText()
+            }
             .navigationTitle("Mini Logbook")
             .padding()
             .alert(viewModel.alertMessage, isPresented: $viewModel.showsAlert, actions: {} )
@@ -81,8 +90,36 @@ struct ContentView: View {
             }
         }
     }
+
+    init(modelContext: ModelContext) {
+        let viewModel = ViewModel(modelContext: modelContext)
+        _viewModel = StateObject(wrappedValue: viewModel)
+    }
 }
 
 #Preview {
-    ContentView()
+    ContentView(modelContext: previewContainer.mainContext)
+}
+
+
+@MainActor
+let previewContainer: ModelContainer = {
+    do {
+        let container = try ModelContainer(
+            for: Measurement.self,
+            configurations: .init(isStoredInMemoryOnly: true)
+        )
+
+        for _ in 1...10 {
+            container.mainContext.insert(generateRandomMeasurement())
+        }
+
+        return container
+    } catch {
+        fatalError("Failed to create container")
+    }
+}()
+
+func generateRandomMeasurement() -> Measurement {
+    return Measurement(value: Float.random(in: 0...20))
 }
