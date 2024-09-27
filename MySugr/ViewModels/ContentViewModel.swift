@@ -72,7 +72,10 @@ extension ContentView {
 
         private func updateAverageText() {
             guard let average = average else { return }
-            averageText = String(format: "%.2f", average)
+
+            if let formattedNumber = NumberFormatter.measurement.string(from: average as NSNumber) {
+                averageText = formattedNumber
+            }
         }
 
         private func parseDecimal(from string: String) -> Decimal? {
