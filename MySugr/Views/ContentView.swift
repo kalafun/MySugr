@@ -12,46 +12,70 @@ struct ContentView: View {
     @StateObject var viewModel = ContentView.ViewModel()
 
     var body: some View {
-        VStack {
-            if let _ = viewModel.average {
-                Text("Your average is: \(viewModel.averageText)" +  " " + viewModel.selectedMeasurementUnit.rawValue)
-            }
+        NavigationStack {
+            VStack {
+                if let _ = viewModel.average {
+                    Text("Your average is: \(viewModel.averageText)" +  " " + viewModel.selectedMeasurementUnit.rawValue)
+                }
 
-            Divider()
+                Divider()
 
-            HStack {
-                Text("Add measurement:")
+                HStack {
+                    Text("Add measurement:")
+                    Spacer()
+                }
+
+                Picker("Select measurement", selection: $viewModel.selectedMeasurementUnit) {
+                    ForEach(MeasurementUnit.allCases) { measurement in
+                        Text(measurement.rawValue)
+                    }
+                }
+                .onChange(of: viewModel.selectedMeasurementUnit, { oldValue, newValue in
+                    viewModel.didChangeMeasurementUnit()
+                })
+                .pickerStyle(.segmented)
+                .frame(width: 200)
+
+                HStack(alignment: .firstTextBaseline, spacing: 20) {
+                    TextField("Input measurement here", text: $viewModel.textInput)
+                        .textFieldStyle(.roundedBorder).padding(.top, 20)
+                        .keyboardType(.decimalPad)
+
+                    Text(viewModel.selectedMeasurementUnit.rawValue)
+                }
+
                 Spacer()
-            }
 
-            Picker("Select measurement", selection: $viewModel.selectedMeasurementUnit) {
-                ForEach(MeasurementUnit.allCases) { measurement in
-                    Text(measurement.rawValue)
+                Button("Save") {
+                    viewModel.save()
+                }
+                .disabled(viewModel.textInput.isEmpty)
+            }
+            .navigationTitle("Mini Logbook")
+            .padding()
+            .alert(viewModel.alertMessage, isPresented: $viewModel.showsAlert, actions: {} )
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        viewModel.showAllMeasurements()
+                    } label: {
+                        Image(systemName: "tray.full")
+                    }
                 }
             }
-            .onChange(of: viewModel.selectedMeasurementUnit, { oldValue, newValue in
-                viewModel.didChangeMeasurementUnit()
-            })
-            .pickerStyle(.segmented)
-            .frame(width: 200)
-
-            HStack(alignment: .firstTextBaseline, spacing: 20) {
-                TextField("Input measurement here", text: $viewModel.textInput)
-                    .textFieldStyle(.roundedBorder).padding(.top, 20)
-                    .keyboardType(.decimalPad)
-
-                Text(viewModel.selectedMeasurementUnit.rawValue)
+            .sheet(isPresented: $viewModel.showsAllMeasurements) {
+                NavigationStack {
+                    MeasurementsView()
+                        .toolbar {
+                            ToolbarItem(placement: .topBarLeading) {
+                                Button("Close") {
+                                    viewModel.showsAllMeasurements = false
+                                }
+                            }
+                        }
+                }
             }
-
-            Spacer()
-
-            Button("Save") {
-                viewModel.save()
-            }
-            .disabled(viewModel.textInput.isEmpty)
         }
-        .padding()
-        .alert(viewModel.alertMessage, isPresented: $viewModel.showsAlert, actions: {} )
     }
 }
 

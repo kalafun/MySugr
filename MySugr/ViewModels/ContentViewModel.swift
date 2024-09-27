@@ -31,6 +31,7 @@ extension ContentView {
         var average: Float?
         @Published var averageText = ""
         @Published var selectedMeasurementUnit: MeasurementUnit = .mgdl
+        @Published var showsAllMeasurements = false
         @Published var textInput = ""
         @Published var showsAlert = false
         var alertMessage = ""
@@ -93,6 +94,10 @@ extension ContentView {
             alertMessage = text
             showsAlert = true
             return
+        }
+
+        func showAllMeasurements() {
+            showsAllMeasurements = true
         }
 
         func didChangeMeasurementUnit() {
