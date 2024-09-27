@@ -10,6 +10,7 @@ import SwiftUI
 struct ContentView: View {
 
     @StateObject var viewModel = ContentView.ViewModel()
+    @StateObject var measurementsViewModel = MeasurementsView.ViewModel()
 
     var body: some View {
         NavigationStack {
@@ -63,9 +64,12 @@ struct ContentView: View {
                     }
                 }
             }
+            .onChange(of: viewModel.measurements, { oldValue, newValue in
+                measurementsViewModel.measurements = newValue
+            })
             .sheet(isPresented: $viewModel.showsAllMeasurements) {
                 NavigationStack {
-                    MeasurementsView()
+                    MeasurementsView(viewModel: measurementsViewModel)
                         .toolbar {
                             ToolbarItem(placement: .topBarLeading) {
                                 Button("Close") {
