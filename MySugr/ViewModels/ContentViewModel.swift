@@ -39,12 +39,15 @@ extension ContentView {
             if textInput.isEmpty { return }
 
             guard let number = parseDecimal(from: textInput) else {
-                alertMessage = "Not a valid number"
-                showsAlert = true
+                showAlert(with: "Not a valid number")
                 return
             }
 
             let floatValue = NSDecimalNumber(decimal: number).floatValue
+            if floatValue < 0 {
+                showAlert(with: "Not a valid number")
+                return
+            }
 
             measurements.append(Measurement(value: floatValue))
 
@@ -75,6 +78,12 @@ extension ContentView {
                 return number.decimalValue
             }
             return nil
+        }
+
+        private func showAlert(with text: String) {
+            alertMessage = text
+            showsAlert = true
+            return
         }
 
         func didChangeMeasurementUnit() {
