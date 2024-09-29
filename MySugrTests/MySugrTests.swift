@@ -82,4 +82,15 @@ class MySugrTests: XCTestCase {
         XCTAssertEqual(viewModel.showsAlert, true)
         XCTAssertEqual(viewModel.alertMessage, "Not a valid number")
     }
+
+    @MainActor
+    func testMeasurementUnitConversionToMgdl() {
+        viewModel.selectedMeasurementUnit = .mgdl
+        viewModel.average = 216
+
+        viewModel.selectedMeasurementUnit = .mmoll
+        viewModel.didChangeMeasurementUnit()
+
+        XCTAssertEqual(viewModel.average, 216 / MeasurementUnit.conversionConstant)
+    }
 }

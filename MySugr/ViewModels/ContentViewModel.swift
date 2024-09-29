@@ -54,7 +54,7 @@ extension ContentView {
         }
 
         func save() {
-            guard textInput.isEmpty, let number = parseDecimal(from: textInput) else {
+            guard !textInput.isEmpty, let number = parseDecimal(from: textInput) else {
                 showAlert(with: "Not a valid number")
                 return
             }
@@ -74,6 +74,8 @@ extension ContentView {
             updateAverageText()
         }
 
+        /// Adds measurement to SwiftData and fetches new data, always adds value in `mg/dl`
+        /// - Parameter value: Float measurement value
         private func addMeasurement(value: Float) {
             // always add measurements in mg/dl unit
             let value = selectedMeasurementUnit == .mgdl ? value : value / MeasurementUnit.conversionConstant
@@ -98,11 +100,7 @@ extension ContentView {
         }
 
         private func parseDecimal(from string: String) -> Decimal? {
-            let formatter = NumberFormatter()
-            formatter.numberStyle = .decimal
-            formatter.locale = Locale.current
-
-            if let number = formatter.number(from: string) {
+            if let number = NumberFormatter.measurement.number(from: string) {
                 return number.decimalValue
             }
             return nil
