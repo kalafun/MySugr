@@ -10,7 +10,7 @@ import SwiftData
 
 enum MeasurementUnit: String, Identifiable {
 
-    private static let conversionConstant: Float = 18.0182
+    static let conversionConstant: Float = 18.0182
 
     var id: Self { self }
 
@@ -21,7 +21,7 @@ enum MeasurementUnit: String, Identifiable {
         [mgdl, mmoll]
     }()
 
-    private static func convertToMgdl(value: Float) -> Float {
+    static func convertToMgdl(value: Float) -> Float {
         value * conversionConstant
     }
 
@@ -34,7 +34,7 @@ enum MeasurementUnit: String, Identifiable {
 
         switch self {
             case .mgdl:
-                measurementValue = MeasurementUnit.convertToMgdl(value: value)
+                measurementValue = value
             case .mmoll:
                 measurementValue = MeasurementUnit.convertToMmoll(value: value)
         }
@@ -99,7 +99,7 @@ extension ContentView {
         /// - Parameter value: Float measurement value
         private func addMeasurement(value: Float) {
             // always add measurements in mg/dl unit
-            let value = selectedMeasurementUnit == .mgdl ? value : MeasurementUnit.convertToMmoll(value: value)
+            let value = selectedMeasurementUnit == .mgdl ? value : MeasurementUnit.convertToMgdl(value: value)
             let measurement = Measurement(value: value)
             modelContext.insert(measurement)
 

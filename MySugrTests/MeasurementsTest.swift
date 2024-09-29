@@ -54,9 +54,7 @@ class MeasurementsTest: XCTestCase {
     }
 
     @MainActor
-    func testStringFromMeasurement() {
-        let measurement = Measurement(value: 3.3)
-
-        XCTAssertEqual(viewModel.stringFromMeasurement(measurement), "3,3")
+    func testStringFromMeasurementValue() {
+        XCTAssertEqual(MeasurementUnit.mgdl.stringFrom(value: 3.3), "3,3 mg/dL")
     }
 }

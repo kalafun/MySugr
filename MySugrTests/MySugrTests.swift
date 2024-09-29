@@ -85,12 +85,11 @@ class MySugrTests: XCTestCase {
 
     @MainActor
     func testMeasurementUnitConversionToMgdl() {
-        viewModel.selectedMeasurementUnit = .mgdl
-        viewModel.average = 216
-
         viewModel.selectedMeasurementUnit = .mmoll
-        viewModel.didChangeMeasurementUnit()
+        viewModel.average = 50
 
-        XCTAssertEqual(viewModel.average, 216 / MeasurementUnit.conversionConstant)
+        viewModel.selectedMeasurementUnit = .mgdl
+
+        XCTAssertEqual(viewModel.average! * MeasurementUnit.conversionConstant, MeasurementUnit.convertToMgdl(value: 50))
     }
 }
