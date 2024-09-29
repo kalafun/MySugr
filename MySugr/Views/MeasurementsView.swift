@@ -18,15 +18,25 @@ struct MeasurementsView: View {
                     Text("You have")
                     Text("\(viewModel.measurements.count) measurements")
                         .fontWeight(.bold)
+                    Spacer()
                 }
+                .padding()
             }
 
             List {
                 ForEach(viewModel.measurements, id: \.id) { measurement in
-                    Text(viewModel.stringFromMeasurement(measurement))
+                    HStack(alignment: .bottom) {
+                        Text(viewModel.measurementUnit.stringFrom(value: measurement.value))
+
+                        Spacer()
+                        Text(measurement.date.formatted(date: .abbreviated, time: .shortened))
+                            .font(.caption)
+                            .foregroundStyle(.gray)
+                    }
                 }
             }
         }
+        .background(Color(UIColor.secondarySystemBackground))
         .overlay {
             if viewModel.measurements.isEmpty {
                 VStack(alignment: .center, spacing: 16) {
@@ -50,7 +60,8 @@ struct MeasurementsView: View {
     NavigationStack {
         MeasurementsView(
             viewModel: MeasurementsView.ViewModel(
-                measurements: Measurement.mocked(count: 0)
+                measurements: Measurement.mocked(count: 10),
+                measurementUnit: .mgdl
             )
         )
     }
@@ -61,13 +72,11 @@ extension MeasurementsView {
     @MainActor
     class ViewModel: ObservableObject {
         @Published var measurements = [Measurement]()
+        @Published var measurementUnit: MeasurementUnit
 
-        init(measurements: [Measurement] = []) {
+        init(measurements: [Measurement] = [], measurementUnit: MeasurementUnit = .mgdl) {
             self.measurements = measurements
-        }
-
-        func stringFromMeasurement(_ measurement: Measurement) -> String {
-            NumberFormatter.measurement.string(from: NSNumber(value: measurement.value)) ?? ""
+            self.measurementUnit = measurementUnit
         }
     }
 }

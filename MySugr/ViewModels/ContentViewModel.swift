@@ -10,7 +10,7 @@ import SwiftData
 
 enum MeasurementUnit: String, Identifiable {
 
-    static let conversionConstant: Float = 18.0182
+    private static let conversionConstant: Float = 18.0182
 
     var id: Self { self }
 
@@ -20,6 +20,27 @@ enum MeasurementUnit: String, Identifiable {
     static var allCases: [Self] = {
         [mgdl, mmoll]
     }()
+
+    private static func convertToMgdl(value: Float) -> Float {
+        value * conversionConstant
+    }
+
+    static func convertToMmoll(value: Float) -> Float {
+        value / conversionConstant
+    }
+
+    func stringFrom(value: Float) -> String {
+        var measurementValue: Float = value
+
+        switch self {
+            case .mgdl:
+                measurementValue = MeasurementUnit.convertToMgdl(value: value)
+            case .mmoll:
+                measurementValue = MeasurementUnit.convertToMmoll(value: value)
+        }
+
+        return (NumberFormatter.measurement.string(from: NSNumber(value: measurementValue)) ?? "") + " " + self.rawValue
+    }
 }
 
 extension ContentView {
@@ -78,7 +99,7 @@ extension ContentView {
         /// - Parameter value: Float measurement value
         private func addMeasurement(value: Float) {
             // always add measurements in mg/dl unit
-            let value = selectedMeasurementUnit == .mgdl ? value : value / MeasurementUnit.conversionConstant
+            let value = selectedMeasurementUnit == .mgdl ? value : MeasurementUnit.convertToMmoll(value: value)
             let measurement = Measurement(value: value)
             modelContext.insert(measurement)
 
@@ -94,9 +115,7 @@ extension ContentView {
         func updateAverageText() {
             guard let average = average else { return }
 
-            if let formattedNumber = NumberFormatter.measurement.string(from: average as NSNumber) {
-                averageText = formattedNumber
-            }
+            averageText = selectedMeasurementUnit.stringFrom(value: average)
         }
 
         private func parseDecimal(from string: String) -> Decimal? {
@@ -117,15 +136,6 @@ extension ContentView {
         }
 
         func didChangeMeasurementUnit() {
-            guard let average else { return }
-
-            switch selectedMeasurementUnit {
-                case .mgdl:
-                    self.average = average * MeasurementUnit.conversionConstant
-                case .mmoll:
-                    self.average = average / MeasurementUnit.conversionConstant
-            }
-
             updateAverageText()
         }
     }

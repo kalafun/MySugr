@@ -18,9 +18,15 @@ struct ContentView: View {
 
     var body: some View {
         NavigationStack {
-            VStack {
+            VStack(spacing: 24) {
                 if let _ = viewModel.average {
-                    Text("Your average is: \(viewModel.averageText)" +  " " + viewModel.selectedMeasurementUnit.rawValue)
+                    HStack(spacing: 4) {
+                        Text("Your average is:")
+                        Text(viewModel.averageText)
+                            .fontWeight(.bold)
+
+                        Spacer()
+                    }
                 }
 
                 Divider()
@@ -37,6 +43,7 @@ struct ContentView: View {
                 }
                 .onChange(of: viewModel.selectedMeasurementUnit, { oldValue, newValue in
                     viewModel.didChangeMeasurementUnit()
+                    measurementsViewModel.measurementUnit = newValue
                 })
                 .pickerStyle(.segmented)
                 .frame(width: 200)
