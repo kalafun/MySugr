@@ -54,9 +54,7 @@ extension ContentView {
         }
 
         func save() {
-            if textInput.isEmpty { return }
-
-            guard let number = parseDecimal(from: textInput) else {
+            guard textInput.isEmpty, let number = parseDecimal(from: textInput) else {
                 showAlert(with: "Not a valid number")
                 return
             }
@@ -81,11 +79,7 @@ extension ContentView {
             let value = selectedMeasurementUnit == .mgdl ? value : value / MeasurementUnit.conversionConstant
             let measurement = Measurement(value: value)
             modelContext.insert(measurement)
-            do {
-                try modelContext.save()
-            } catch {
-                showAlert(with: "Failed to save measurement")
-            }
+
             fetchData()
         }
 

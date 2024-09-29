@@ -5,13 +5,81 @@
 //  Created by Tomas Bobko on 27.09.24.
 //
 
-import Testing
+import XCTest
+import SwiftData
 @testable import MySugr
 
-struct MySugrTests {
+fileprivate let testContainer: ModelContainer = {
+    do {
+        let container = try ModelContainer(
+            for: Measurement.self,
+            configurations: .init(isStoredInMemoryOnly: true)
+        )
 
-    @Test func example() async throws {
-        // Write your test here and use APIs like `#expect(...)` to check expected conditions.
+        return container
+    } catch {
+        fatalError("Failed to create container")
+    }
+}()
+
+class MySugrTests: XCTestCase {
+
+    var viewModel: ContentView.ViewModel!
+
+    override func setUp() async throws {
+        try await super.setUp()
+
+        await MainActor.run {
+            viewModel = ContentView.ViewModel(modelContext: testContainer.mainContext)
+        }
     }
 
+    override func tearDown() {
+        viewModel = nil
+        super.tearDown()
+    }
+
+    @MainActor
+    func testCalculateAverage() {
+
+        let measurements = [
+            Measurement(value: 5),
+            Measurement(value: 10),
+            Measurement(value: 15)
+        ]
+        viewModel.measurements = measurements
+        viewModel.calculateAverage()
+
+        XCTAssertEqual(viewModel.average, 10.0, "Average calculation is incorrect.")
+    }
+
+    @MainActor
+    func testSaveValidMeasurement() {
+
+        viewModel.textInput = "3,2"
+        viewModel.save()
+
+        XCTAssertEqual(viewModel.measurements.count, 1)
+        XCTAssertEqual(viewModel.measurements.first?.value, 3.2)
+    }
+
+    @MainActor
+    func testSaveEmptyMeasurement() {
+        viewModel.textInput = ""
+        viewModel.save()
+
+        XCTAssertTrue(viewModel.measurements.isEmpty)
+        XCTAssertEqual(viewModel.showsAlert, true)
+        XCTAssertEqual(viewModel.alertMessage, "Not a valid number")
+    }
+
+    @MainActor
+    func testSaveInvalidMeasurement() {
+        viewModel.textInput = "abc"
+        viewModel.save()
+
+        XCTAssertTrue(viewModel.measurements.isEmpty)
+        XCTAssertEqual(viewModel.showsAlert, true)
+        XCTAssertEqual(viewModel.alertMessage, "Not a valid number")
+    }
 }

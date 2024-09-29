@@ -9,6 +9,29 @@
 			<key>orderHint</key>
 			<integer>0</integer>
 		</dict>
+		<key>MySugrTests.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>1</integer>
+		</dict>
+	</dict>
+	<key>SuppressBuildableAutocreation</key>
+	<dict>
+		<key>C3BB3FD32CA6C77D00BC0725</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>C3BB3FE32CA6C77E00BC0725</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>C3BB3FED2CA6C77E00BC0725</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 	</dict>
 </dict>
 </plist>
